@@ -8,7 +8,7 @@ interface GameBoardProps {
 
 export const GameBoard: React.FC<GameBoardProps> = ({ grid, onCellClick }) => {
     return (
-        <div className="grid grid-cols-5 gap-2 w-full max-w-[400px] mx-auto aspect-square">
+        <div className="grid grid-cols-5 gap-3 w-full max-w-[400px] mx-auto aspect-square p-4 bg-black/40 rounded-xl border border-[#5D4037]">
             {grid.map((row, rIndex) => (
                 row.map((isOn, cIndex) => (
                     <button
@@ -17,13 +17,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({ grid, onCellClick }) => {
                         className={`
               w-full h-full rounded-lg transition-all duration-300 transform hover:scale-105
               ${isOn
-                                ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)] border-indigo-400'
-                                : 'bg-gray-700 border-gray-600 hover:bg-gray-600'
+                                ? 'bg-[#FFD700] shadow-[0_0_20px_rgba(255,215,0,0.6)] border-[#FFD700] scale-100'
+                                : 'bg-[#2c241b] border-[#5D4037] hover:bg-[#3e3326] scale-95 opacity-80'
                             }
-              border
+              border-2 relative overflow-hidden
             `}
                         aria-label={`Cell ${rIndex},${cIndex} is ${isOn ? 'on' : 'off'}`}
-                    />
+                    >
+                        {/* Inner glow effect for lit cells */}
+                        {isOn && <div className="absolute inset-0 bg-white/30 blur-sm" />}
+                    </button>
                 ))
             ))}
         </div>

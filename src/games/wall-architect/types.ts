@@ -15,7 +15,6 @@ export interface Position {
 export interface Piece {
     id: string;
     shape: PieceShape;
-    color: string;
     position: Position | null; // null if in inventory
     isDragging?: boolean;
 }

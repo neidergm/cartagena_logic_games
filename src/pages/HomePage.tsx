@@ -37,7 +37,7 @@ export const HomePage: React.FC = () => {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] text-center space-y-12 px-4">
+        <div className="flex flex-col items-center justify-center min-h-[80vh] text-center space-y-12 px-4 py-7">
             <div className="space-y-6 max-w-3xl">
                 <div className="flex justify-center mb-6">
                     <div className="p-4 bg-amber-500/10 rounded-full ring-1 ring-amber-500/50">
@@ -49,11 +49,11 @@ export const HomePage: React.FC = () => {
                         Cartagena
                     </h1>
                     <h3 className="text-2xl font-bold text-amber-500 mb-2 font-['Cinzel']">
-                        Help with logic games
+                        Juegos de lógica
                     </h3>
                 </div>
                 <p className="text-xl text-stone-400 leading-relaxed font-['Lato']">
-                    Resolve logic games to help the fantastic city grow and be better
+                    Resuelve juegos de lógica para ayudar a crecer y ser mejor a la fantástica ciudad
                 </p>
             </div>
 
@@ -74,8 +74,8 @@ export const HomePage: React.FC = () => {
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-stone-800 bg-stone-900/80 text-xs uppercase tracking-wider text-amber-500 font-['Cinzel']">
-                                        <th scope="col" className="px-6 py-5 font-bold">Game</th>
-                                        <th scope="col" className="px-6 py-5 font-bold hidden md:table-cell">Description</th>
+                                        <th scope="col" className="px-6 py-5 font-bold">Juego</th>
+                                        <th scope="col" className="px-6 py-5 font-bold hidden md:table-cell">Descripción</th>
                                         <th scope="col" className="px-6 py-5 font-bold text-right"></th>
                                     </tr>
                                 </thead>
@@ -120,7 +120,7 @@ export const HomePage: React.FC = () => {
                                                     to={`/game/${game.slug}`}
                                                     className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-bold text-stone-900 hover:bg-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all duration-300 transform group-hover:translate-x-1"
                                                 >
-                                                    Play <Play className="h-4 w-4 fill-current" />
+                                                    Jugar <Play className="h-4 w-4 fill-current" />
                                                 </Link>
                                             </td>
                                         </tr>

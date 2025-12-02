@@ -7,6 +7,8 @@ export const Auth: React.FC = () => {
     const [sent, setSent] = useState(false);
     const [message, setMessage] = useState<{ text: string, type: 'error' | 'success' } | null>(null);
 
+    const [otpCode, setOtpCode] = useState('');
+
     const handleSendMagicLink = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -24,17 +26,35 @@ export const Auth: React.FC = () => {
             setLoading(false);
         } else {
             setSent(true);
-            setMessage({ text: '¡Enlace mágico enviado! Revisa tu correo.', type: 'success' });
+            setMessage({ text: '¡Enlace enviado! Revisa tu correo o ingresa el código.', type: 'success' });
             setLoading(false);
         }
     };
 
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage(null);
+
+        const { error } = await supabase.auth.verifyOtp({
+            email,
+            token: otpCode,
+            type: 'email',
+        });
+
+        if (error) {
+            setMessage({ text: error.message, type: 'error' });
+            setLoading(false);
+        } else {
+            // Session is handled automatically by onAuthStateChange in Layout
+            // We don't need to do anything here other than maybe show success
+            setMessage({ text: '¡Acceso concedido!', type: 'success' });
+        }
+    };
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#1a1614] font-['Lato'] p-4">
+        <div className="min-h-screen flex items-center justify-center font-['Lato'] p-4">
             <div className="bg-[#2c241b] p-8 rounded-lg border border-[#5D4037] shadow-2xl max-w-md w-full">
-                <h1 className="text-3xl font-bold text-[#FFD700] font-['Cinzel'] text-center mb-2">
-                    Cartagena Games
-                </h1>
                 <p className="text-stone-400 text-center mb-8">Acceso a la Plataforma</p>
 
                 {message && (
@@ -64,7 +84,7 @@ export const Auth: React.FC = () => {
                             disabled={loading}
                             className="w-full bg-[#8B4513] hover:bg-[#A0522D] text-white font-bold py-3 px-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-[#deb887]/20"
                         >
-                            {loading ? 'Enviando...' : 'Enviar Enlace Mágico'}
+                            {loading ? 'Cargando...' : 'Continuar'}
                         </button>
                     </form>
                 ) : (
@@ -72,18 +92,38 @@ export const Auth: React.FC = () => {
                         <div className="bg-black/20 p-6 rounded-lg border border-[#5D4037]/50">
                             <div className="text-4xl mb-4">📧</div>
                             <h3 className="text-[#FFD700] font-bold text-lg mb-2">¡Revisa tu bandeja!</h3>
-                            <p className="text-stone-400 text-sm">
+                            <p className="text-stone-400 text-sm mb-4">
                                 Hemos enviado un enlace de acceso a <span className="text-white font-mono">{email}</span>
                             </p>
-                            <p className="text-stone-500 text-xs mt-4">
-                                Puedes cerrar esta pestaña una vez hayas hecho click en el enlace.
-                            </p>
+
+                            <div className="border-t border-[#5D4037]/30 pt-4 mt-4">
+                                <p className="text-stone-300 text-sm mb-3">O ingresa el código de seguridad:</p>
+                                <form onSubmit={handleVerifyOtp} className="space-y-3">
+                                    <input
+                                        type="text"
+                                        value={otpCode}
+                                        onChange={(e) => setOtpCode(e.target.value)}
+                                        className="w-full bg-black/30 border border-[#5D4037] rounded p-3 text-center text-xl tracking-widest text-[#FFD700] focus:border-[#FFD700] focus:outline-none transition-colors font-mono"
+                                        placeholder="00000000"
+                                        maxLength={8}
+                                        required
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-[#8B4513] hover:bg-[#A0522D] text-white font-bold py-2 px-4 rounded transition-colors disabled:opacity-50 border border-[#deb887]/20"
+                                    >
+                                        {loading ? 'Verificando...' : 'Verificar Código'}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
                         <button
                             onClick={() => {
                                 setSent(false);
                                 setMessage(null);
+                                setOtpCode('');
                             }}
                             className="text-stone-500 hover:text-[#deb887] text-sm underline transition-colors"
                         >

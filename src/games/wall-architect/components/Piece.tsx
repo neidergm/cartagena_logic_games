@@ -2,25 +2,25 @@ import React from 'react';
 import type { Piece as PieceType } from '../types';
 import { clsx } from 'clsx';
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
 
 interface PieceProps {
     piece: PieceType;
     inInventory?: boolean;
     onClick?: () => void;
     isOverlay?: boolean;
+    cellSize?: number;
 }
 
-export const Piece: React.FC<PieceProps> = ({ piece, inInventory, onClick, isOverlay }) => {
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+export const Piece: React.FC<PieceProps> = ({ piece, inInventory, onClick, isOverlay, cellSize }) => {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: piece.id,
         data: { piece },
         disabled: !inInventory && !isOverlay,
     });
 
     const style = {
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.8 : 1, // Less transparent to keep texture visible
+        // transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.2 : 1, // Less transparent to keep texture visible
         filter: isDragging ? 'drop-shadow(0 10px 15px rgba(0,0,0,0.5))' : undefined,
     };
 
@@ -32,12 +32,14 @@ export const Piece: React.FC<PieceProps> = ({ piece, inInventory, onClick, isOve
     `,
     };
 
+    const finalCellSize = cellSize || 32;
+
     const renderContent = () => (
         <div
             style={{
                 display: 'grid',
-                gridTemplateColumns: `repeat(${piece.shape[0].length}, minmax(0, 1fr))`,
-                gap: '0px', // No gap for solid stone look, or small gap for bricks
+                gridTemplateColumns: `repeat(${piece.shape[0].length}, ${finalCellSize}px)`,
+                gap: '0px',
             }}
         >
             {piece.shape.map((row, rIndex) => (
@@ -45,9 +47,13 @@ export const Piece: React.FC<PieceProps> = ({ piece, inInventory, onClick, isOve
                     {row.map((cell, cIndex) => (
                         <div
                             key={`${rIndex}-${cIndex}`}
-                            style={cell === 1 ? pieceTexture : undefined}
+                            style={{
+                                ...(cell === 1 ? pieceTexture : undefined),
+                                width: `${finalCellSize}px`,
+                                height: `${finalCellSize}px`,
+                            }}
                             className={clsx(
-                                'w-8 h-8 transition-all',
+                                // Removed transition-all to prevent displacement feeling during resize
                                 cell === 1
                                     ? 'bg-[#A08B6B] border border-[#5D4037]/40 shadow-[inset_0_1px_3px_rgba(255,255,255,0.3),inset_0_-1px_3px_rgba(0,0,0,0.2)]'
                                     : 'bg-transparent',
@@ -58,7 +64,7 @@ export const Piece: React.FC<PieceProps> = ({ piece, inInventory, onClick, isOve
                 </React.Fragment>
             ))}
         </div>
-    );
+    )
 
     if (isOverlay) {
         return (

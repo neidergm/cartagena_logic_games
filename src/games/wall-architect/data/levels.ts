@@ -1,11 +1,12 @@
 import { type BoardMatrix, type LevelConfig } from '../types';
-import { LEVELS_DATA, type LevelData } from './levels-data';
+import { getShape } from '../utils';
+import { type LevelData } from './levels-data';
 
 const createEmptyBoard = (rows: number, cols: number): BoardMatrix =>
     Array(rows).fill(null).map(() => Array(cols).fill(0));
 
 // Engine function to convert JSON data into playable LevelConfig
-const createLevelFromData = (data: LevelData): LevelConfig => {
+export const createLevelFromData = (data: LevelData): LevelConfig => {
     return {
         id: data.id,
         rows: data.rows,
@@ -13,7 +14,8 @@ const createLevelFromData = (data: LevelData): LevelConfig => {
         boardSetup: (rows, cols) => {
             const board = createEmptyBoard(rows, cols);
             data.solution.forEach(p => {
-                const { shape, row, col } = p;
+                const { shape: s, row, col } = p;
+                const shape = getShape(s as never);
                 for (let i = 0; i < shape.length; i++) {
                     for (let j = 0; j < shape[i].length; j++) {
                         if (shape[i][j] === 1) {
@@ -26,15 +28,12 @@ const createLevelFromData = (data: LevelData): LevelConfig => {
             });
             return board;
         },
-        pieces: data.solution.map(p => ({
-            id: p.pieceId,
-            shape: p.shape,
-            color: p.color,
-            position: null // Start in inventory
+        pieces: data.solution.map((p, i) => ({
+            id: `p${data.id}_${i}`,
+            shape: getShape(p.shape as never),
+            position: null
         }))
     };
 };
-
-export const LEVELS: LevelConfig[] = LEVELS_DATA.map(createLevelFromData);
 
 

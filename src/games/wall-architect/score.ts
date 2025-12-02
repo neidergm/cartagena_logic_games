@@ -44,31 +44,4 @@ export const saveGameScore = async (levelId: number, stats: LevelStats) => {
     }
 };
 
-export const getHighestUnlockedLevel = async (): Promise<number> => {
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return 1;
 
-        const { data, error } = await supabase
-            .from('game_scores')
-            .select('level_id')
-            .eq('user_id', user.id)
-            .order('level_id', { ascending: false })
-            .limit(1);
-
-        if (error) {
-            console.error('Error fetching progress:', error);
-            return 1;
-        }
-
-        if (data && data.length > 0) {
-            // If they finished level X, they should be on level X + 1
-            return data[0].level_id + 1;
-        }
-
-        return 1;
-    } catch (err) {
-        console.error('Unexpected error fetching progress:', err);
-        return 1;
-    }
-};

@@ -11,7 +11,7 @@ interface GridCellProps {
     ghostType?: 'valid' | 'invalid' | null;
 }
 
-export const GridCell: React.FC<GridCellProps> = ({ type, row, col, isOverlay, ghostType }) => {
+export const GridCell: React.FC<GridCellProps> = React.memo(({ type, row, col, isOverlay, ghostType }) => {
     const { setNodeRef } = useDroppable({
         id: `cell-${row}-${col}`,
         data: { row, col },
@@ -30,10 +30,11 @@ export const GridCell: React.FC<GridCellProps> = ({ type, row, col, isOverlay, g
 
     return (
         <div
+            id={`cell-${row}-${col}`}
             ref={setNodeRef}
             style={type === 0 || type === 2 ? stoneTexture : undefined}
             className={clsx(
-                'w-10 h-10 border border-stone-900/30 flex items-center justify-center transition-all duration-200 relative',
+                'w-full aspect-square border border-stone-900/30 flex items-center justify-center transition-all duration-200 relative',
                 {
                     // Wall (Intact) - Warm stone color
                     'bg-[#8B7355] shadow-[inset_0_0_10px_rgba(0,0,0,0.3)]': type === 0 && !ghostType,
@@ -42,13 +43,13 @@ export const GridCell: React.FC<GridCellProps> = ({ type, row, col, isOverlay, g
                     'bg-[#1a1510] shadow-[inset_0_0_15px_rgba(0,0,0,0.8)]': type === 1 && !ghostType,
 
                     // Occupied (Placed Piece) - Slightly lighter/different stone to distinguish
-                    'bg-[#A08B6B] shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_4px_rgba(0,0,0,0.4)] z-10': type === 2 && !ghostType,
+                    'bg-[#A08B6B] shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_4px_rgba(0,0,0,0.1)] z-10': type === 2 && !ghostType,
 
                     'opacity-50': isOverlay,
 
                     // Ghost feedback
-                    'bg-green-500/40 ring-2 ring-green-400 z-20': ghostType === 'valid',
-                    'bg-red-500/40 ring-2 ring-red-400 z-20': ghostType === 'invalid',
+                    'bg-green-400/40 ring-1 ring-green-400 z-20': ghostType === 'valid',
+                    'bg-red-400/40 ring-1 ring-red-400 z-20': ghostType === 'invalid',
                 }
             )}
         >
@@ -58,4 +59,10 @@ export const GridCell: React.FC<GridCellProps> = ({ type, row, col, isOverlay, g
             )}
         </div>
     );
-};
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.type === nextProps.type &&
+        prevProps.ghostType === nextProps.ghostType &&
+        prevProps.isOverlay === nextProps.isOverlay
+    );
+});

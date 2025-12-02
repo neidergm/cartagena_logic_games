@@ -1,9 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { HomePage } from './pages/HomePage';
-import { GamePage as LightsOutGame } from './games/lights-out/LightsOutGame';
-import { LightsOutInstructions } from './games/lights-out/LightsOutInstructions';
-import { WallArchitectGame } from './games/wall-architect/WallArchitectGame';
+import { Analytics } from "@vercel/analytics/react"
+import { GameBox } from './games/GameBox';
 
 function App() {
 
@@ -13,11 +12,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
-            <Route path="game/lights-out" element={<LightsOutInstructions />} />
-            <Route path="game/lights-out/play" element={<LightsOutGame />} />
-            <Route path="game/wall-architect" element={<WallArchitectGame />} />
+            <Route path="game/:slug" element={<GameBox />} />
           </Route>
         </Routes>
+        <Analytics />
       </BrowserRouter>
     )
   );

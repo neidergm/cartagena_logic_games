@@ -107,3 +107,31 @@ export const checkLevelCompleted = (board: BoardMatrix): boolean => {
     }
     return true;
 };
+
+
+
+// Common Shapes (Inlined for JSON purity, or could be referenced if we had a shapes table)
+// Shape is an array of rows, each row is an array of columns, example:
+// [[1, 1], [1, 1]]
+// 1 is a block, 0 is empty space
+const SHAPES = {
+    SQUARE_2x2: [[1, 1], [1, 1]],
+    SQUARE_3x3: [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    BAR_2x1: [[1, 1]],
+    BAR_3x1: [[1, 1, 1]],
+    BAR_4x1: [[1, 1, 1, 1]],
+    BAR_5x1: [[1, 1, 1, 1, 1]],
+    BAR_1x3: [[1], [1], [1]],
+    BAR_1x5: [[1], [1], [1], [1], [1]],
+    L_3: [[1, 0], [1, 1]],
+    L_4: [[1, 0], [1, 0], [1, 1]],
+    J_4: [[0, 1], [0, 1], [1, 1]],
+    T_4: [[1, 1, 1], [0, 1, 0]],
+    O_4: [[1, 1], [1, 1]],
+    I_4: [[1, 1, 1, 1]],
+    Z_4: [[1, 1, 0], [0, 1, 1]],
+    S_4: [[0, 1, 1], [1, 1, 0]],
+};
+
+export const getShape = (shape: keyof typeof SHAPES | number[][]): PieceShape =>
+    typeof shape === 'string' ? SHAPES[shape] : shape;

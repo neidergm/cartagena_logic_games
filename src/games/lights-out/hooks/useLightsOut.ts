@@ -26,6 +26,8 @@ export const useLightsOut = () => {
     const [moves, setMoves] = useState(0);
     const [isWon, setIsWon] = useState(false);
 
+    const [timeElapsed, setTimeElapsed] = useState(0);
+
     const resetGame = useCallback(() => {
         let newGrid = createEmptyGrid();
         // Simulate random moves to ensure solvability
@@ -36,6 +38,7 @@ export const useLightsOut = () => {
         }
         setGrid(newGrid);
         setMoves(0);
+        setTimeElapsed(0);
         setIsWon(false);
     }, []);
 
@@ -43,6 +46,17 @@ export const useLightsOut = () => {
     useEffect(() => {
         resetGame();
     }, [resetGame]);
+
+    // Timer Effect
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
+        if (!isWon) {
+            interval = setInterval(() => {
+                setTimeElapsed(prev => prev + 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [isWon]);
 
     const handleCellClick = useCallback((row: number, col: number) => {
         if (isWon) return;
@@ -57,5 +71,5 @@ export const useLightsOut = () => {
         setMoves(prev => prev + 1);
     }, [isWon]);
 
-    return { grid, moves, isWon, handleCellClick, resetGame };
+    return { grid, moves, timeElapsed, isWon, handleCellClick, resetGame };
 };
