@@ -74,9 +74,9 @@ export const HomePage: React.FC = () => {
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-stone-800 bg-stone-900/80 text-xs uppercase tracking-wider text-amber-500 font-['Cinzel']">
-                                        <th scope="col" className="px-6 py-5 font-bold">Juego</th>
-                                        <th scope="col" className="px-6 py-5 font-bold hidden md:table-cell">Descripción</th>
-                                        <th scope="col" className="px-6 py-5 font-bold text-right"></th>
+                                        <th scope="col" className="px-3 py-4 sm:px-6 sm:py-5 font-bold">Juego</th>
+                                        <th scope="col" className="px-3 py-4 sm:px-6 sm:py-5 font-bold hidden md:table-cell">Descripción</th>
+                                        <th scope="col" className="px-3 py-4 sm:px-6 sm:py-5 font-bold text-right"></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-stone-800">
@@ -85,9 +85,9 @@ export const HomePage: React.FC = () => {
                                             key={game.id}
                                             className="group hover:bg-stone-800/40 transition-colors duration-300"
                                         >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-stone-800 bg-stone-900 group-hover:border-amber-500/30 transition-colors">
+                                            <td className="px-3 py-3 sm:px-6 sm:py-4">
+                                                <div className="flex items-center gap-3 sm:gap-4">
+                                                    <div className="relative h-16 w-20 sm:w-24 flex-shrink-0 overflow-hidden rounded-lg border border-stone-800 bg-stone-900 group-hover:border-amber-500/30 transition-colors">
                                                         {game.image_url ? (
                                                             <img
                                                                 src={game.image_url}
@@ -101,10 +101,10 @@ export const HomePage: React.FC = () => {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <div className="font-['Cinzel'] text-lg font-bold text-stone-200 group-hover:text-amber-500 transition-colors">
+                                                        <div className="font-['Cinzel'] text-base sm:text-lg font-bold text-stone-200 group-hover:text-amber-500 transition-colors">
                                                             {game.name}
                                                         </div>
-                                                        <div className="md:hidden mt-1 text-sm text-stone-500 line-clamp-2">
+                                                        <div className="md:hidden mt-1 text-xs sm:text-sm text-stone-500 line-clamp-2">
                                                             {game.description}
                                                         </div>
                                                     </div>
@@ -115,12 +115,12 @@ export const HomePage: React.FC = () => {
                                                     {game.description}
                                                 </p>
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-3 py-3 sm:px-6 sm:py-4 text-right">
                                                 <Link
                                                     to={`/game/${game.slug}`}
-                                                    className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2.5 text-sm font-bold text-stone-900 hover:bg-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all duration-300 transform group-hover:translate-x-1"
+                                                    className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-3 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold text-stone-900 hover:bg-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all duration-300 transform group-hover:translate-x-1"
                                                 >
-                                                    Jugar <Play className="h-4 w-4 fill-current" />
+                                                    Jugar <Play className="h-3 w-3 sm:h-4 sm:w-4 fill-current" />
                                                 </Link>
                                             </td>
                                         </tr>
