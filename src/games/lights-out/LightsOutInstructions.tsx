@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Lightbulb, Play, ArrowLeft } from 'lucide-react';
 
-export const LightsOutInstructions: React.FC = () => {
+const LightsOutInstructions: React.FC = () => {
     return (
         <div className="min-h-screen relative flex items-center justify-center p-4 font-['Cinzel']">
             {/* Background Image */}
@@ -65,3 +65,4 @@ export const LightsOutInstructions: React.FC = () => {
         </div>
     );
 };
+export default LightsOutInstructions;

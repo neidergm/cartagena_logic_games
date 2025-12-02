@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useWallArchitectStore } from './store';
-import { saveGameScore } from './score';
 import { IntroView } from './components/IntroView';
 import { PlayingView } from './components/PlayingView';
 import { VictoryModal } from './components/VictoryModal';
+import { saveGameScore } from '../../services/scoreService';
+import { calculateScore } from './utils';
+import { getHighestUnlockedLevel } from '../../services/gameService';
+import { createLevelFromData } from './levelsEngine';
+import { type LevelData } from './types';
 
 type GameView = 'intro' | 'playing';
 
@@ -12,36 +16,44 @@ interface WallArchitectGameProps {
     initialLevel: number;
 }
 
-export const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId, initialLevel }) => {
+const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId }) => {
     // Only subscribe to what we need for the high-level logic to avoid re-renders on every tick
-    // We use a selector or just access the store directly in effects where possible, 
-    // but for 'levelCompleted' we need to react to it.
     const levelCompleted = useWallArchitectStore((state) => state.levelCompleted);
-    const currentLevelIndex = useWallArchitectStore((state) => state.currentLevelIndex);
     const setLevel = useWallArchitectStore((state) => state.setLevel);
-    const nextLevel = useWallArchitectStore((state) => state.nextLevel);
-    const tickTime = useWallArchitectStore((state) => state.tickTime);
-    const loadLevels = useWallArchitectStore((state) => state.loadLevels);
-    const isLoadingLevels = useWallArchitectStore((state) => state.isLoadingLevels);
 
-    // We need to access stats for saving score, but we don't want to re-render on every tick.
-    // We can use useWallArchitectStore.getState() inside the effect, 
-    // BUT we need the effect to trigger when levelCompleted becomes true.
+    const tickTime = useWallArchitectStore((state) => state.tickTime);
 
     const [view, setView] = useState<GameView>('intro');
     const [isLoading, setIsLoading] = useState(true);
+    const [gameCompleted, setGameCompleted] = useState(false);
 
-    // Load Progress Effect
+    const loadLevel = async () => {
+        setIsLoading(true);
+        if (gameId) {
+            const levelData = await getHighestUnlockedLevel(gameId);
+
+            if (!levelData) {
+                // No more levels or error
+                setGameCompleted(true);
+                setIsLoading(false);
+                return;
+            }
+
+            // Transform DB data to Game Config
+            const gameLevel = createLevelFromData(levelData.config as LevelData);
+            // Ensure ID is set from the DB record, not just config
+            gameLevel.id = levelData.id;
+
+            setLevel(gameLevel, levelData);
+            setGameCompleted(false);
+        }
+        setIsLoading(false);
+    };
+
+    // Initial Load
     useEffect(() => {
-        const loadProgress = async () => {
-            await loadLevels(gameId);
-            // Use initialLevel passed from prop, but we might want to verify or just set it.
-            // initialLevel is 1-based.
-            setLevel(initialLevel - 1);
-            setIsLoading(false);
-        };
-        loadProgress();
-    }, [setLevel, loadLevels, gameId, initialLevel]);
+        loadLevel();
+    }, [gameId]);
 
     const gameStarted = useWallArchitectStore((state) => state.gameStarted);
 
@@ -62,33 +74,51 @@ export const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId, in
         if (levelCompleted) {
             // Get fresh stats from store without subscribing to them in the component body
             const currentStats = useWallArchitectStore.getState().stats;
-            // We need to save using the level ID (PK) from the levels array
-            const levels = useWallArchitectStore.getState().levels;
-            const currentLevelConfig = levels[currentLevelIndex];
+            const currentLevel = useWallArchitectStore.getState().level;
 
-            if (currentLevelConfig) {
-                saveGameScore(currentLevelConfig.id, currentStats);
+            if (currentLevel) {
+                saveGameScore(
+                    currentLevel.id,
+                    {
+                        timeElapsed: currentStats.timeElapsed,
+                        moves: currentStats.movesCount,
+                        score: calculateScore(currentStats),
+                    }
+                );
             }
         }
-    }, [levelCompleted, currentLevelIndex]);
+    }, [levelCompleted]);
 
     const handleCrackFound = () => {
         setView('playing');
     };
 
-    const handleBackToMap = () => {
+    const handleNextLevel = async () => {
+        await loadLevel();
         setView('intro');
     };
 
-    const handleNextLevel = () => {
-        nextLevel();
-        setView('intro');
-    };
-
-    if (isLoading || isLoadingLevels) {
+    if (isLoading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center text-[#FFD700] font-['Cinzel']">
-                <div className="text-2xl animate-pulse">Cargando Progreso...</div>
+                <div className="text-2xl animate-pulse">Cargando Nivel...</div>
+            </div>
+        );
+    }
+
+    if (gameCompleted) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center text-[#FFD700] font-['Cinzel']">
+                <div className="text-center p-8 border border-[#FFD700] rounded bg-[#2c241b]">
+                    <h2 className="text-4xl font-bold mb-4">¡Juego Completado!</h2>
+                    <p className="text-stone-300 mb-6">Has restaurado todas las murallas. ¡Excelente trabajo!</p>
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="px-6 py-3 bg-[#8B4513] hover:bg-[#A0522D] text-white rounded border border-[#deb887]/30 transition-all"
+                    >
+                        Volver al Inicio
+                    </button>
+                </div>
             </div>
         );
     }
@@ -98,7 +128,7 @@ export const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId, in
             {view === 'intro' ? (
                 <IntroView onCrackFound={handleCrackFound} />
             ) : (
-                <PlayingView onBackToMap={handleBackToMap} />
+                <PlayingView />
             )}
 
             {levelCompleted && (
@@ -107,3 +137,4 @@ export const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId, in
         </>
     );
 };
+export default WallArchitectGame;

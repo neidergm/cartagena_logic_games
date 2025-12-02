@@ -17,17 +17,13 @@ import {
 } from '@dnd-kit/core';
 import type { Piece as PieceType, Position } from '../types';
 
-interface PlayingViewProps {
-    onBackToMap: () => void;
-}
-
-export const PlayingView: React.FC<PlayingViewProps> = ({ onBackToMap }) => {
+export const PlayingView: React.FC = () => {
     const {
         inventoryPieces,
         rotatePiece,
         placePiece,
         resetLevel,
-        currentLevelIndex,
+        levelInfo,
         stats,
         levelCompleted
     } = useWallArchitectStore();
@@ -211,7 +207,7 @@ export const PlayingView: React.FC<PlayingViewProps> = ({ onBackToMap }) => {
                     <h1 className="text-2xl font-bold text-[#FFD700] font-['Cinzel'] tracking-widest">
                         Zona de Reparación
                     </h1>
-                    <p className="text-stone-400 text-sm">Sector: Torre del Reloj - Nivel {currentLevelIndex + 1}</p>
+                    <p className="text-stone-400 text-sm">Sector: Torre del Reloj - Nivel {levelInfo?.level_number}</p>
                 </div>
                 <div className="flex gap-6 text-stone-300 font-mono text-sm">
                     <div className="flex flex-col items-center">

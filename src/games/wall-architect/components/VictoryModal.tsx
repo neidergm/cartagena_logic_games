@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWallArchitectStore } from '../store';
-import { calculateScore } from '../score';
+import { calculateScore } from '../utils';
 
 interface VictoryModalProps {
     onNextLevel: () => void;

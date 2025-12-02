@@ -5,6 +5,7 @@ interface WinMessageProps {
     moves: number;
     timeElapsed: number;
     onPlayAgain: () => void;
+    isLastLevel?: boolean;
 }
 
 const formatTime = (seconds: number) => {
@@ -13,7 +14,7 @@ const formatTime = (seconds: number) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-export const WinMessage: React.FC<WinMessageProps> = ({ moves, timeElapsed, onPlayAgain }) => {
+export const WinMessage: React.FC<WinMessageProps> = ({ moves, timeElapsed, onPlayAgain, isLastLevel = false }) => {
     return (
         <div className="aspect-square w-full max-w-[400px] mx-auto bg-black/40 rounded-xl flex flex-col items-center justify-center border border-[#FFD700]/30 animate-fade-in p-6">
             <div className="relative mb-6">
@@ -31,7 +32,7 @@ export const WinMessage: React.FC<WinMessageProps> = ({ moves, timeElapsed, onPl
                 onClick={onPlayAgain}
                 className="px-8 py-3 bg-gradient-to-r from-[#8B4513] to-[#A0522D] hover:scale-105 text-white rounded-lg font-bold transition-all border border-[#FFD700]/50 shadow-lg tracking-wider font-['Cinzel']"
             >
-                Jugar de Nuevo
+                {isLastLevel ? 'Jugar de Nuevo' : 'Siguiente Nivel'}
             </button>
         </div>
     );

@@ -1,6 +1,5 @@
-import { type BoardMatrix, type LevelConfig } from '../types';
-import { getShape } from '../utils';
-import { type LevelData } from './levels-data';
+import { type BoardMatrix, type LevelConfig, type LevelData } from './types';
+import { getShape } from './utils';
 
 const createEmptyBoard = (rows: number, cols: number): BoardMatrix =>
     Array(rows).fill(null).map(() => Array(cols).fill(0));

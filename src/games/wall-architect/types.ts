@@ -19,6 +19,15 @@ export interface Piece {
     isDragging?: boolean;
 }
 
+export interface LevelData {
+    id: number;
+    rows: number;
+    cols: number;
+    solution: ({
+        shape: number;
+    } & Position)[];
+}
+
 export interface LevelStats {
     clicksToFindCrack: number;
     movesCount: number;

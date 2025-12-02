@@ -1,18 +1,22 @@
 import { create } from 'zustand';
 import { type GameState } from './types';
 import { rotateMatrix, isValidPlacement, placePieceOnBoard, checkLevelCompleted } from './utils';
-import { fetchLevelsByGameId } from './services/levelService';
 import { type LevelConfig } from './types';
+import type { LeveInfo } from '../../services/gameService';
 
 interface ExtendedGameState extends GameState {
-    currentLevelIndex: number;
     gameStarted: boolean;
-    levels: LevelConfig[];
-    isLoadingLevels: boolean;
+    level: LevelConfig | null;
+    levelInfo: LeveInfo | null;
     startGame: () => void;
-    nextLevel: () => void;
-    setLevel: (levelIndex: number) => void;
-    loadLevels: (gameId: number) => Promise<void>;
+    setLevel: (level: LevelConfig, levelInfo: LeveInfo) => void;
+    rotatePiece: (pieceId: string) => void;
+    placePiece: (pieceId: string, position: { row: number; col: number }) => void;
+    removePiece: (pieceId: string) => void;
+    resetLevel: () => void;
+    incrementSearchClicks: () => void;
+    incrementMoves: () => void;
+    tickTime: () => void;
 }
 
 export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
@@ -20,10 +24,8 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
     inventoryPieces: [],
     placedPieces: [],
     levelCompleted: false,
-
-    currentLevelIndex: 0,
-    levels: [],
-    isLoadingLevels: false,
+    levelInfo: null,
+    level: null,
     stats: {
         clicksToFindCrack: 0,
         movesCount: 0,
@@ -82,8 +84,8 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
     },
 
     resetLevel: () => set((state) => {
-        if (state.levels.length === 0) return {};
-        const levelConfig = state.levels[state.currentLevelIndex];
+        if (!state.level) return {};
+        const levelConfig = state.level;
         const rows = levelConfig.rows || 8;
         const cols = levelConfig.cols || 8;
         return {
@@ -94,27 +96,6 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
             placedPieces: [],
             levelCompleted: false,
             stats: state.stats
-        };
-    }),
-
-    nextLevel: () => set((state) => {
-        if (state.levels.length === 0) return {};
-        const nextIndex = (state.currentLevelIndex + 1) % state.levels.length;
-        const levelConfig = state.levels[nextIndex];
-        const rows = levelConfig.rows || 8;
-        const cols = levelConfig.cols || 8;
-        return {
-            gameStarted: false,
-            currentLevelIndex: nextIndex,
-            board: levelConfig.boardSetup(rows, cols),
-            inventoryPieces: [...levelConfig.pieces],
-            placedPieces: [],
-            levelCompleted: false,
-            stats: {
-                clicksToFindCrack: 0,
-                movesCount: 0,
-                timeElapsed: 0,
-            }
         };
     }),
 
@@ -130,17 +111,15 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
         stats: { ...state.stats, timeElapsed: state.stats.timeElapsed + 1 }
     })),
 
-    setLevel: (levelIndex: number) => set((state) => {
-        if (state.levels.length === 0) return {};
-        const safeIndex = Math.max(0, Math.min(levelIndex, state.levels.length - 1));
-        const levelConfig = state.levels[safeIndex];
-        const rows = levelConfig.rows || 8;
-        const cols = levelConfig.cols || 8;
-        return {
+    setLevel: (level: LevelConfig, levelInfo: LeveInfo) => {
+        const rows = level.rows || 8;
+        const cols = level.cols || 8;
+        set({
+            level,
+            levelInfo,
             gameStarted: false,
-            currentLevelIndex: safeIndex,
-            board: levelConfig.boardSetup(rows, cols),
-            inventoryPieces: [...levelConfig.pieces],
+            board: level.boardSetup(rows, cols),
+            inventoryPieces: [...level.pieces],
             placedPieces: [],
             levelCompleted: false,
             stats: {
@@ -148,19 +127,6 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
                 movesCount: 0,
                 timeElapsed: 0,
             }
-        };
-    }),
-
-    loadLevels: async (gameId: number) => {
-        set({ isLoadingLevels: true });
-        const levels = await fetchLevelsByGameId(gameId);
-        set({ levels, isLoadingLevels: false });
-        // Initialize first level if levels found
-        if (levels.length > 0) {
-            useWallArchitectStore.getState().resetLevel();
-        }
+        });
     }
 }));
-
-// Initialize first level
-

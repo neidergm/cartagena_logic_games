@@ -1,48 +1,25 @@
 import { useState, useCallback, useEffect } from 'react';
 import { type TGridState } from '../types/game';
+import { createEmptyGrid, createLevelFromData, toggleCell } from '../levelsEngine';
 
 const GRID_SIZE = 5;
 
-const createEmptyGrid = (): TGridState =>
-    Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(false));
-
-const toggleCell = (grid: TGridState, row: number, col: number): TGridState => {
-    const newGrid = grid.map(r => [...r]);
-    const directions = [[0, 0], [0, 1], [0, -1], [1, 0], [-1, 0]];
-
-    directions.forEach(([dr, dc]) => {
-        const r = row + dr;
-        const c = col + dc;
-        if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE) {
-            newGrid[r][c] = !newGrid[r][c];
-        }
-    });
-
-    return newGrid;
-};
-
-export const useLightsOut = () => {
-    const [grid, setGrid] = useState<TGridState>(createEmptyGrid());
+export const useLightsOut = (gridSize = GRID_SIZE, complexity = 10) => {
+    const [grid, setGrid] = useState<TGridState>(createEmptyGrid(gridSize));
     const [moves, setMoves] = useState(0);
     const [isWon, setIsWon] = useState(false);
 
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     const resetGame = useCallback(() => {
-        let newGrid = createEmptyGrid();
-        // Simulate random moves to ensure solvability
-        for (let i = 0; i < 10; i++) {
-            const r = Math.floor(Math.random() * GRID_SIZE);
-            const c = Math.floor(Math.random() * GRID_SIZE);
-            newGrid = toggleCell(newGrid, r, c);
-        }
+        const newGrid = createLevelFromData(gridSize, complexity);
         setGrid(newGrid);
         setMoves(0);
         setTimeElapsed(0);
         setIsWon(false);
-    }, []);
+    }, [gridSize, complexity]);
 
-    // Initialize game on mount
+    // Initialize game on mount or when config changes
     useEffect(() => {
         resetGame();
     }, [resetGame]);

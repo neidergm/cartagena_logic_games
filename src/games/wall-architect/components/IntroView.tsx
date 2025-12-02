@@ -6,7 +6,7 @@ interface IntroViewProps {
 }
 
 export const IntroView: React.FC<IntroViewProps> = ({ onCrackFound }) => {
-    const { currentLevelIndex, stats, incrementSearchClicks, startGame, gameStarted } = useWallArchitectStore();
+    const { levelInfo, stats, incrementSearchClicks, startGame, gameStarted } = useWallArchitectStore();
 
     // Search Phase State
     const [crackFound, setCrackFound] = useState(false);
@@ -108,8 +108,8 @@ export const IntroView: React.FC<IntroViewProps> = ({ onCrackFound }) => {
                 <div className="mt-8 bg-black/60 p-6 rounded-xl backdrop-blur-md border border-[#FFD700]/30 max-w-md mx-4 shadow-2xl">
                     <p className="text-white text-xl mb-2 font-bold">Misión de Inspección</p>
                     <p className="text-stone-300">
-                        Nivel {currentLevelIndex + 1}
-                        <br />
+                        Nivel {levelInfo?.level_number}
+                        <br /><br />
                         <span className="text-[#FFD700]">Haz click en la muralla</span> para encontrar la grieta oculta.
                         <br />
                         <span className="text-sm text-stone-400 mt-2 block">¡Usa las pistas de temperatura!</span>
@@ -120,7 +120,7 @@ export const IntroView: React.FC<IntroViewProps> = ({ onCrackFound }) => {
             {/* Persistent HUD - Shows on start */}
             <div className={`absolute top-0 left-0 right-0 z-10 flex justify-between items-center px-6 py-4 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-500 ${gameStarted && !crackFound ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="text-[#FFD700] font-bold text-lg drop-shadow-md">
-                    EL ARQUITECTO - Nivel {currentLevelIndex + 1}
+                    EL ARQUITECTO - Nivel {levelInfo?.level_number}
                 </div>
                 <div className="flex gap-6 text-white font-mono text-sm drop-shadow-md">
                     <div className="flex flex-col items-center">

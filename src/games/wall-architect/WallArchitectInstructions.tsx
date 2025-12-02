@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Hammer, Search, ArrowLeft, Play } from 'lucide-react';
 
-export const WallArchitectInstructions: React.FC = () => {
+const WallArchitectInstructions: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 font-['Lato']">
             <div className="mb-8">
@@ -97,3 +97,4 @@ export const WallArchitectInstructions: React.FC = () => {
         </div>
     );
 };
+export default WallArchitectInstructions;

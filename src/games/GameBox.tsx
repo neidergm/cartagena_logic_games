@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { fetchGameBySlug, getHighestUnlockedLevel, type Game } from '../services/gameService';
+import { loadGameComponent } from './gameLoader';
 
 export const GameBox: React.FC = () => {
     const { slug } = useParams();
@@ -21,7 +22,7 @@ export const GameBox: React.FC = () => {
             if (gameData) {
                 setGame(gameData);
                 const level = await getHighestUnlockedLevel(gameData.id);
-                setInitialLevel(level);
+                setInitialLevel(level?.level_number || 1);
             }
             setLoadingGame(false);
         };
@@ -30,23 +31,13 @@ export const GameBox: React.FC = () => {
 
     // Lazy load games
     const GameComponent = useMemo(() => {
-        switch (slug) {
-            case 'wall-architect-play':
-                return React.lazy(() => import('./wall-architect/WallArchitectGame').then(module => ({ default: module.WallArchitectGame })));
-            case 'lights-out-play':
-                return React.lazy(() => import('./lights-out/LightsOutGame').then(module => ({ default: module.GamePage })));
-            case 'wall-architect':
-                return React.lazy(() => import('./wall-architect/WallArchitectInstructions').then(module => ({ default: module.WallArchitectInstructions })));
-            case 'lights-out':
-                return React.lazy(() => import('./lights-out/LightsOutInstructions').then(module => ({ default: module.LightsOutInstructions })));
-            default:
-                return null;
-        }
+        if (!slug) return null;
+        return loadGameComponent(slug);
     }, [slug]);
 
     if (loadingGame) {
         return (
-            <div className="flex items-center justify-center min-h-[50vh] text-white">
+            <div className="flex items-center justify-center min-h-[50vh] text-white font-['Cinzel']">
                 <div className="text-xl animate-pulse">Cargando información del juego...</div>
             </div>
         );
@@ -58,7 +49,7 @@ export const GameBox: React.FC = () => {
         // WallArchitect needs gameId.
         if (!game && (slug?.includes('wall-architect'))) {
             return (
-                <div className="flex items-center justify-center min-h-[50vh] text-white">
+                <div className="flex items-center justify-center min-h-[50vh] text-white font-['Cinzel']">
                     <div className="text-center">
                         <h2 className="text-2xl font-bold mb-2">Juego no encontrado</h2>
                         <p className="text-gray-400">No se pudo cargar la información del juego "{slug}".</p>
@@ -70,7 +61,7 @@ export const GameBox: React.FC = () => {
 
     if (!GameComponent) {
         return (
-            <div className="flex items-center justify-center min-h-[50vh] text-white">
+            <div className="flex items-center justify-center min-h-[50vh] text-white font-['Cinzel']">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold mb-2">Juego no encontrado</h2>
                     <p className="text-gray-400">El juego "{slug}" no existe o no está disponible.</p>
@@ -85,7 +76,7 @@ export const GameBox: React.FC = () => {
     return (
         <Suspense
             fallback={
-                <div className="flex items-center justify-center min-h-[50vh] text-white">
+                <div className="flex items-center justify-center min-h-[50vh] text-white font-['Cinzel']">
                     <div className="text-xl animate-pulse">Cargando experiencia...</div>
                 </div>
             }
