@@ -1,9 +1,8 @@
 import React from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useLightsOutStore } from '../store';
 
 interface GameHeaderProps {
-    moves: number;
-    timeElapsed: number;
     onReset: () => void;
     level: number;
 }
@@ -14,7 +13,9 @@ const formatTime = (seconds: number) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-export const GameHeader: React.FC<GameHeaderProps> = ({ moves, timeElapsed, onReset, level }) => {
+export const GameHeader: React.FC<GameHeaderProps> = ({ onReset, level }) => {
+    const moves = useLightsOutStore(state => state.moves);
+    const timeElapsed = useLightsOutStore(state => state.timeElapsed);
 
     return (
         <div className="flex justify-between items-center mb-8 border-b border-[#5D4037]/50 pb-4 flex-wrap gap-4">

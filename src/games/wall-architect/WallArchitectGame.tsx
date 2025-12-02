@@ -83,7 +83,8 @@ const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId }) => {
                         timeElapsed: currentStats.timeElapsed,
                         moves: currentStats.movesCount,
                         score: calculateScore(currentStats),
-                    }
+                    },
+                    gameId
                 );
             }
         }

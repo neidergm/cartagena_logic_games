@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useLightsOut } from './hooks/useLightsOut';
+import React, { useState, useEffect } from 'react';
+import { useLightsOutStore } from './store';
 import { GameHeader } from './components/GameHeader';
 import { GameBoard } from './components/GameBoard';
 import { WinMessage } from './components/WinMessage';
@@ -22,6 +22,13 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [gameCompleted, setGameCompleted] = useState(false);
 
+    // Store selectors
+    const grid = useLightsOutStore(state => state.grid);
+    const isWon = useLightsOutStore(state => state.isWon);
+    const resetGame = useLightsOutStore(state => state.resetGame);
+    const toggleLight = useLightsOutStore(state => state.toggleLight);
+    const initializeGame = useLightsOutStore(state => state.initializeGame);
+    console.log(levelInfo);
     // Load level
     const loadLevel = async () => {
         setIsLoading(true);
@@ -38,24 +45,42 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
         setIsLoading(false);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         loadLevel();
     }, [gameId]);
 
     const currentLevelConfig = (levelInfo?.config as any) || { gridSize: 5, complexity: 10 };
 
-    const { grid, moves, timeElapsed, isWon, handleCellClick, resetGame } = useLightsOut(
-        currentLevelConfig.gridSize,
-        currentLevelConfig.complexity
-    );
+    // Initialize game when level info changes
+    useEffect(() => {
+        if (levelInfo) {
+            initializeGame(currentLevelConfig.gridSize, currentLevelConfig.complexity);
+        }
+    }, [levelInfo, initializeGame]); // Removed currentLevelConfig dependency to avoid deep comparison issues if it's a new object every render
+
+    // Timer Logic - Optimized to avoid re-renders
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
+        // We check store state directly in the interval to avoid dependencies
+        interval = setInterval(() => {
+            const state = useLightsOutStore.getState();
+            if (state.isPlaying && !state.isWon) {
+                state.incrementTime();
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     const [showExitConfirm, setShowExitConfirm] = useState(false);
     const navigate = useNavigate();
 
     // Handle Level Completion
-    React.useEffect(() => {
+    useEffect(() => {
         if (isWon) {
             // Save score
             const levelId = levelInfo?.id;
+            const { moves, timeElapsed } = useLightsOutStore.getState();
 
             const stats = {
                 timeElapsed,
@@ -72,19 +97,14 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
                     moves,
                     timeElapsed,
                     score: stats.score,
-                });
+                }, gameId);
             }
         }
-    }, [isWon, levelInfo, moves, timeElapsed]);
+    }, [isWon, levelInfo]);
 
     const handleNextLevel = async () => {
         await loadLevel();
     };
-
-    // Force reset when level changes (even if config is same)
-    React.useEffect(() => {
-        resetGame();
-    }, [levelInfo, resetGame]);
 
     const handleExit = () => {
         navigate('/');
@@ -162,19 +182,20 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
             <div className="absolute inset-0 bg-black/70 z-0" />
 
             <div className="relative z-10 bg-black/60 rounded-2xl p-4 sm:p-8 border border-[#FFD700]/30 backdrop-blur-md w-full max-w-2xl shadow-2xl">
-                <GameHeader moves={moves} timeElapsed={timeElapsed} onReset={resetGame} level={levelInfo?.level_number || 1} />
+                <GameHeader
+                    onReset={() => resetGame(currentLevelConfig.gridSize, currentLevelConfig.complexity)}
+                    level={levelInfo?.level_number || 1}
+                />
 
                 {isWon ? (
                     <WinMessage
-                        moves={moves}
-                        timeElapsed={timeElapsed}
                         onPlayAgain={() => {
                             handleNextLevel();
                         }}
                         isLastLevel={false} // Always show "Next Level" until game completed screen
                     />
                 ) : (
-                    <GameBoard grid={grid} onCellClick={handleCellClick} />
+                    <GameBoard grid={grid} onCellClick={toggleLight} />
                 )}
 
                 <div className="mt-8 text-center text-stone-400 text-sm font-sans">

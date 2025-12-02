@@ -1,9 +1,8 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
+import { useLightsOutStore } from '../store';
 
 interface WinMessageProps {
-    moves: number;
-    timeElapsed: number;
     onPlayAgain: () => void;
     isLastLevel?: boolean;
 }
@@ -14,7 +13,10 @@ const formatTime = (seconds: number) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-export const WinMessage: React.FC<WinMessageProps> = ({ moves, timeElapsed, onPlayAgain, isLastLevel = false }) => {
+export const WinMessage: React.FC<WinMessageProps> = ({ onPlayAgain, isLastLevel = false }) => {
+    const moves = useLightsOutStore(state => state.moves);
+    const timeElapsed = useLightsOutStore(state => state.timeElapsed);
+
     return (
         <div className="aspect-square w-full max-w-[400px] mx-auto bg-black/40 rounded-xl flex flex-col items-center justify-center border border-[#FFD700]/30 animate-fade-in p-6">
             <div className="relative mb-6">

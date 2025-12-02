@@ -1,8 +1,9 @@
 import type { TGridState } from "./types/game";
 
-
-export const createEmptyGrid = (size: number): TGridState =>
-    Array(size).fill(null).map(() => Array(size).fill(false));
+export const createEmptyGrid = (size: number): TGridState => {
+    const numericSize = Number(size);
+    return Array(numericSize).fill(null).map(() => Array(numericSize).fill(false));
+};
 
 export const toggleCell = (grid: TGridState, row: number, col: number): TGridState => {
     const size = grid.length;
@@ -30,4 +31,4 @@ export const createLevelFromData = (gridSize: number, complexity: number): TGrid
     }
 
     return newGrid;
-}
+};

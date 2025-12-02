@@ -7,8 +7,13 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({ grid, onCellClick }) => {
+    const gridSize = grid.length;
+
     return (
-        <div className="grid grid-cols-5 gap-2 w-full max-w-[400px] mx-auto aspect-square p-3 sm:p-4 bg-black/40 rounded-xl border border-[#5D4037]">
+        <div
+            className="grid gap-2 w-full max-w-[400px] mx-auto aspect-square p-3 sm:p-4 bg-black/40 rounded-xl border border-[#5D4037]"
+            style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
+        >
             {grid.map((row, rIndex) => (
                 row.map((isOn, cIndex) => (
                     <button
