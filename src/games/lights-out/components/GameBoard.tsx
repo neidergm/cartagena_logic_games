@@ -8,7 +8,7 @@ interface GameBoardProps {
 
 export const GameBoard: React.FC<GameBoardProps> = ({ grid, onCellClick }) => {
     return (
-        <div className="grid grid-cols-5 gap-3 w-full max-w-[400px] mx-auto aspect-square p-4 bg-black/40 rounded-xl border border-[#5D4037]">
+        <div className="grid grid-cols-5 gap-2 w-full max-w-[400px] mx-auto aspect-square p-3 sm:p-4 bg-black/40 rounded-xl border border-[#5D4037]">
             {grid.map((row, rIndex) => (
                 row.map((isOn, cIndex) => (
                     <button

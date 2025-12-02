@@ -116,7 +116,7 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
     }
 
     return (
-        <div className="min-h-screen relative flex flex-col items-center justify-center p-4 font-['Cinzel']">
+        <div className="min-h-screen relative flex flex-col items-center justify-center p-2 sm:p-4 font-['Cinzel']">
             {/* Exit Button */}
             <button
                 onClick={() => setShowExitConfirm(true)}
@@ -128,7 +128,7 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
 
             {/* Exit Confirmation Modal */}
             {showExitConfirm && (
-                <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
                     <div className="bg-[#2c241b] p-8 rounded-lg border border-[#5D4037] shadow-2xl max-w-sm w-full text-center relative">
                         <h3 className="text-xl font-bold text-[#FFD700] font-['Cinzel'] mb-4">¿Abandonar Partida?</h3>
                         <p className="text-stone-300 mb-8 font-sans">El progreso actual se perderá.</p>
@@ -161,7 +161,7 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
             />
             <div className="absolute inset-0 bg-black/70 z-0" />
 
-            <div className="relative z-10 bg-black/60 rounded-2xl p-8 border border-[#FFD700]/30 backdrop-blur-md w-full max-w-2xl shadow-2xl">
+            <div className="relative z-10 bg-black/60 rounded-2xl p-4 sm:p-8 border border-[#FFD700]/30 backdrop-blur-md w-full max-w-2xl shadow-2xl">
                 <GameHeader moves={moves} timeElapsed={timeElapsed} onReset={resetGame} level={levelInfo?.level_number || 1} />
 
                 {isWon ? (

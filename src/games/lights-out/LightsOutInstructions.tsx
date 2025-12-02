@@ -4,7 +4,7 @@ import { Lightbulb, Play, ArrowLeft } from 'lucide-react';
 
 const LightsOutInstructions: React.FC = () => {
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 font-['Cinzel']">
+        <div className="min-h-screen relative flex items-center justify-center p-2 md:p-4 font-['Cinzel']">
             {/* Background Image */}
             <div
                 className="absolute inset-0 z-0"
@@ -24,7 +24,7 @@ const LightsOutInstructions: React.FC = () => {
                     </Link>
                 </div>
 
-                <div className="bg-black/60 rounded-2xl p-8 border border-[#FFD700]/30 backdrop-blur-md shadow-2xl">
+                <div className="bg-black/60 rounded-2xl p-4 md:p-8 border border-[#FFD700]/30 backdrop-blur-md shadow-2xl">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="p-3 bg-[#FFD700]/10 rounded-xl border border-[#FFD700]/20">
                             <Lightbulb className="w-8 h-8 text-[#FFD700]" />
@@ -48,13 +48,13 @@ const LightsOutInstructions: React.FC = () => {
                             </ul>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-[#5D4037]/30">
+                        <div className="flex items-center justify-between pt-4 border-t border-[#5D4037]/30 flex-wrap gap-4">
                             <div className="text-sm text-stone-500">
                                 Dificultad: <span className="text-[#FFD700] font-medium">Media</span>
                             </div>
                             <Link
                                 to="/game/lights-out-play"
-                                className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-[#8B4513] to-[#A0522D] hover:scale-105 text-white rounded-lg font-bold transition-all border border-[#FFD700]/50 shadow-lg tracking-wider font-['Cinzel']"
+                                className="w-full sm:w-auto justify-center inline-flex items-center px-8 py-3 bg-gradient-to-r from-[#8B4513] to-[#A0522D] hover:scale-105 text-white rounded-lg font-bold transition-all border border-[#FFD700]/50 shadow-lg tracking-wider font-['Cinzel']"
                             >
                                 Jugar Ahora <Play className="w-4 h-4 ml-2 fill-current" />
                             </Link>

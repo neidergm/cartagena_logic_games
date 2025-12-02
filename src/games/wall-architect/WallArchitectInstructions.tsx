@@ -4,7 +4,7 @@ import { Hammer, Search, ArrowLeft, Play } from 'lucide-react';
 
 const WallArchitectInstructions: React.FC = () => {
     return (
-        <div className="max-w-4xl mx-auto px-4 py-8 font-['Lato']">
+        <div className="max-w-4xl mx-auto px-2 md:px-4 py-8 font-['Lato']">
             <div className="mb-8">
                 <Link to="/" className="inline-flex items-center text-stone-400 hover:text-[#FFD700] transition-colors font-['Cinzel']">
                     <ArrowLeft className="w-4 h-4 mr-2" />
@@ -12,16 +12,16 @@ const WallArchitectInstructions: React.FC = () => {
                 </Link>
             </div>
 
-            <div className="bg-[#2c241b]/95 rounded-2xl p-8 md:p-12 border border-[#5D4037] shadow-2xl backdrop-blur-sm relative overflow-hidden">
+            <div className="bg-[#2c241b]/95 rounded-2xl p-4 md:p-8 md:p-12 border border-[#5D4037] shadow-2xl backdrop-blur-sm relative overflow-hidden">
                 {/* Decorative background element */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFD700]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-10 relative z-10">
+                <div className="flex items-start gap-6 mb-10 relative z-10">
                     <div className="p-4 bg-[#4a3728] rounded-2xl border border-[#8B4513] shadow-lg">
                         <Hammer className="w-12 h-12 text-[#FFD700]" />
                     </div>
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-[#FFD700] font-['Cinzel'] mb-2 tracking-wide">
+                        <h1 className="text-3xl md:text-4xl font-bold text-[#FFD700] font-['Cinzel'] mb-2 tracking-wide">
                             El Arquitecto
                         </h1>
                         <p className="text-stone-400 text-lg">Restauración de las Murallas de Cartagena</p>
@@ -81,13 +81,13 @@ const WallArchitectInstructions: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-8 border-t border-[#5D4037]">
+                    <div className="flex items-center justify-between pt-8 border-t border-[#5D4037] flex-wrap gap-4">
                         <div className="text-sm text-stone-500 font-mono">
                             Dificultad: <span className="text-[#FFD700]">Progresiva</span>
                         </div>
                         <Link
                             to="/game/wall-architect-play"
-                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#8B4513] to-[#A0522D] hover:from-[#A0522D] hover:to-[#8B4513] text-white rounded-lg font-bold transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] border border-[#FFD700]/30 font-['Cinzel'] tracking-wider text-lg"
+                            className="w-full sm:w-auto justify-center inline-flex items-center px-8 py-4 bg-gradient-to-r from-[#8B4513] to-[#A0522D] hover:from-[#A0522D] hover:to-[#8B4513] text-white rounded-lg font-bold transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,215,0,0.3)] border border-[#FFD700]/30 font-['Cinzel'] tracking-wider text-lg"
                         >
                             Comenzar Obra <Play className="w-5 h-5 ml-3 fill-current" />
                         </Link>
