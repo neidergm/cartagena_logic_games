@@ -8,7 +8,7 @@ import { WinMessage } from './components/WinMessage';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 
-import { fetchLevels } from '../../services/gameService';
+import { getHighestUnlockedLevel, type LeveInfo } from '../../services/gameService';
 import { saveGameScore } from '../../services/scoreService';
 import { calculateScore } from './utils';
 
@@ -17,27 +17,32 @@ interface LightsOutGameProps {
     initialLevel: number;
 }
 
-const GamePage: React.FC<LightsOutGameProps> = ({ gameId, initialLevel }) => {
-    const [levels, setLevels] = useState<any[]>([]);
-    const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
+    const [levelInfo, setLevelInfo] = useState<LeveInfo | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [gameCompleted, setGameCompleted] = useState(false);
 
-    // Load levels
-    React.useEffect(() => {
-        const load = async () => {
-            if (gameId) {
-                const fetchedLevels = await fetchLevels(gameId);
-                setLevels(fetchedLevels);
-                // initialLevel is 1-based
-                const startIndex = Math.max(0, Math.min(initialLevel - 1, fetchedLevels.length - 1));
-                setCurrentLevelIndex(startIndex);
+    // Load level
+    const loadLevel = async () => {
+        setIsLoading(true);
+        if (gameId) {
+            const data = await getHighestUnlockedLevel(gameId);
+            if (!data) {
+                setGameCompleted(true);
+                setIsLoading(false);
+                return;
             }
-            setIsLoading(false);
-        };
-        load();
-    }, [gameId, initialLevel]);
+            setLevelInfo(data);
+            setGameCompleted(false);
+        }
+        setIsLoading(false);
+    };
 
-    const currentLevelConfig = levels[currentLevelIndex]?.config || { gridSize: 5, complexity: 10 };
+    React.useEffect(() => {
+        loadLevel();
+    }, [gameId]);
+
+    const currentLevelConfig = (levelInfo?.config as any) || { gridSize: 5, complexity: 10 };
 
     const { grid, moves, timeElapsed, isWon, handleCellClick, resetGame } = useLightsOut(
         currentLevelConfig.gridSize,
@@ -50,7 +55,7 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId, initialLevel }) => {
     React.useEffect(() => {
         if (isWon) {
             // Save score
-            const levelId = levels[currentLevelIndex]?.id;
+            const levelId = levelInfo?.id;
 
             const stats = {
                 timeElapsed,
@@ -70,39 +75,45 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId, initialLevel }) => {
                 });
             }
         }
-    }, [isWon, currentLevelIndex, levels, moves, timeElapsed]);
+    }, [isWon, levelInfo, moves, timeElapsed]);
 
-    const handleNextLevel = () => {
-        if (currentLevelIndex < levels.length - 1) {
-            setCurrentLevelIndex(prev => prev + 1);
-            // The hook will auto-reset when config changes (gridSize/complexity), 
-            // BUT if config is same, it might not reset.
-            // We should force reset or ensure config change triggers it.
-            // useLightsOut has useEffect[resetGame] and resetGame depends on [gridSize, complexity].
-            // If next level has same config, it won't trigger.
-            // We need to manually reset if config is same.
-            // Actually, let's just call resetGame() in a useEffect when level changes?
-            // Or better, expose a way to force reset.
-            // Let's rely on the key prop or explicit reset.
-            // Simplest: Add a key to the hook or component?
-            // Or just call resetGame() here? No, we can't call hook method from here easily without ref.
-            // Let's use a key on the GameBoard or wrapper to force re-mount of hook?
-            // Or better: add currentLevelIndex to useLightsOut dependency? No, hook shouldn't know about levels.
-            // Let's add a useEffect here to reset when level index changes.
-        } else {
-            // Game Over / All Levels Done
-            navigate('/');
-        }
+    const handleNextLevel = async () => {
+        await loadLevel();
     };
 
     // Force reset when level changes (even if config is same)
     React.useEffect(() => {
         resetGame();
-    }, [currentLevelIndex, resetGame]);
+    }, [levelInfo, resetGame]);
 
     const handleExit = () => {
         navigate('/');
     };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center text-[#FFD700] font-['Cinzel']">
+                <div className="text-2xl animate-pulse">Cargando Nivel...</div>
+            </div>
+        );
+    }
+
+    if (gameCompleted) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center text-[#FFD700] font-['Cinzel']">
+                <div className="text-center p-8 border border-[#FFD700] rounded bg-[#2c241b]">
+                    <h2 className="text-4xl font-bold mb-4">¡Juego Completado!</h2>
+                    <p className="text-stone-300 mb-6">Has completado todos los niveles. ¡Excelente trabajo!</p>
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="px-6 py-3 bg-[#8B4513] hover:bg-[#A0522D] text-white rounded border border-[#deb887]/30 transition-all"
+                    >
+                        Volver al Inicio
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen relative flex flex-col items-center justify-center p-4 font-['Cinzel']">
@@ -151,20 +162,16 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId, initialLevel }) => {
             <div className="absolute inset-0 bg-black/70 z-0" />
 
             <div className="relative z-10 bg-black/60 rounded-2xl p-8 border border-[#FFD700]/30 backdrop-blur-md w-full max-w-2xl shadow-2xl">
-                <GameHeader moves={moves} timeElapsed={timeElapsed} onReset={resetGame} />
+                <GameHeader moves={moves} timeElapsed={timeElapsed} onReset={resetGame} level={levelInfo?.level_number || 1} />
 
                 {isWon ? (
                     <WinMessage
                         moves={moves}
                         timeElapsed={timeElapsed}
                         onPlayAgain={() => {
-                            if (currentLevelIndex < levels.length - 1) {
-                                handleNextLevel();
-                            } else {
-                                resetGame();
-                            }
+                            handleNextLevel();
                         }}
-                        isLastLevel={currentLevelIndex >= levels.length - 1}
+                        isLastLevel={false} // Always show "Next Level" until game completed screen
                     />
                 ) : (
                     <GameBoard grid={grid} onCellClick={handleCellClick} />
