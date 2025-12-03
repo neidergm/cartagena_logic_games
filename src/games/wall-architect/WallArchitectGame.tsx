@@ -123,7 +123,7 @@ const WallArchitectGame: React.FC<WallArchitectGameProps> = ({ gameId }) => {
             </div>
         );
     }
-    return <PlayingView />
+
     return (
         <>
             {view === 'intro' ? (
