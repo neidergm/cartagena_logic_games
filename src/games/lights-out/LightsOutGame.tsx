@@ -97,7 +97,7 @@ const GamePage: React.FC<LightsOutGameProps> = ({ gameId }) => {
                     moves,
                     timeElapsed,
                     score: stats.score,
-                }, gameId);
+                });
             }
         }
     }, [isWon, levelInfo]);
