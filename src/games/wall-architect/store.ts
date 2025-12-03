@@ -8,6 +8,7 @@ interface ExtendedGameState extends GameState {
     gameStarted: boolean;
     level: LevelConfig | null;
     levelInfo: LeveInfo | null;
+    cellSize: number;
     startGame: () => void;
     setLevel: (level: LevelConfig, levelInfo: LeveInfo) => void;
     rotatePiece: (pieceId: string) => void;
@@ -17,6 +18,7 @@ interface ExtendedGameState extends GameState {
     incrementSearchClicks: () => void;
     incrementMoves: () => void;
     tickTime: () => void;
+    setCellSize: (cellSize: number) => void;
 }
 
 export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
@@ -31,8 +33,10 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
         movesCount: 0,
         timeElapsed: 0,
     },
-
     gameStarted: false,
+    cellSize: 0,
+
+    setCellSize: (cellSize: number) => set({ cellSize }),
 
     startGame: () => set({ gameStarted: true }),
 
@@ -53,28 +57,27 @@ export const useWallArchitectStore = create<ExtendedGameState>((set) => ({
 
     placePiece: (pieceId, position) => set((state) => {
         const piece = state.inventoryPieces.find((p) => p.id === pieceId);
+
         if (!piece) return {};
 
-        if (isValidPlacement(state.board, piece.shape, position.row, position.col)) {
-            const newBoard = placePieceOnBoard(state.board, piece.shape, position.row, position.col);
-            const newPlacedPiece = { ...piece, position };
+        const stats = { ...state.stats, movesCount: state.stats.movesCount + 1 }
 
-            const newInventory = state.inventoryPieces.filter((p) => p.id !== pieceId);
-            const newPlacedPieces = [...state.placedPieces, newPlacedPiece];
+        if (!isValidPlacement(state.board, piece.shape, position.row, position.col)) return { stats };
 
-            const isCompleted = checkLevelCompleted(newBoard);
+        const newBoard = placePieceOnBoard(state.board, piece.shape, position.row, position.col);
+        const newPlacedPiece = { ...piece, position };
 
-            return {
-                board: newBoard,
-                inventoryPieces: newInventory,
-                placedPieces: newPlacedPieces,
-                levelCompleted: isCompleted,
-                stats: { ...state.stats, movesCount: state.stats.movesCount + 1 }
-            };
-        }
-        // Invalid placement: still count the move
+        const newInventory = state.inventoryPieces.filter((p) => p.id !== pieceId);
+        const newPlacedPieces = [...state.placedPieces, newPlacedPiece];
+
+        const isCompleted = checkLevelCompleted(newBoard);
+
         return {
-            stats: { ...state.stats, movesCount: state.stats.movesCount + 1 }
+            board: newBoard,
+            inventoryPieces: newInventory,
+            placedPieces: newPlacedPieces,
+            levelCompleted: isCompleted,
+            stats
         };
     }),
 

@@ -145,3 +145,15 @@ export const calculateScore = (stats: LevelStats): number => {
 
     return Math.max(0, score); // Minimum score 0
 };
+
+export const calculateGridCoords = (activeRect: any, overRect: any, cellSize: number) => {
+    if (!activeRect || !overRect) return null;
+
+    const relativeX = activeRect.left - overRect.left;
+    const relativeY = activeRect.top - overRect.top;
+
+    return {
+        col: Math.round(relativeX / cellSize),
+        row: Math.round(relativeY / cellSize),
+    };
+}

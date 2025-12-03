@@ -1,9 +1,9 @@
 import React from 'react';
 import type { CellType } from '../types';
 import { clsx } from 'clsx';
-import { useDroppable } from '@dnd-kit/core';
 
 interface GridCellProps {
+    size: number;
     type: CellType;
     row: number;
     col: number;
@@ -11,11 +11,19 @@ interface GridCellProps {
     ghostType?: 'valid' | 'invalid' | null;
 }
 
-export const GridCell: React.FC<GridCellProps> = React.memo(({ type, row, col, isOverlay, ghostType }) => {
-    const { setNodeRef } = useDroppable({
-        id: `cell-${row}-${col}`,
-        data: { row, col },
-    });
+export const GridCell: React.FC<GridCellProps> = React.memo(({
+    size,
+    type,
+    row,
+    col,
+    isOverlay,
+    ghostType
+}) => {
+
+    const cellStyle = {
+        width: `${size}px`,
+        height: `${size}px`,
+    };
 
     // Stone texture pattern (CSS radial gradient trick)
     const stoneTexture = {
@@ -25,16 +33,16 @@ export const GridCell: React.FC<GridCellProps> = React.memo(({ type, row, col, i
       linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1))
     `,
         backgroundSize: '100% 100%, 4px 4px, 4px 4px',
-        backgroundPosition: '0 0, 0 0, 2px 2px'
+        backgroundPosition: '0 0, 0 0, 2px 2px',
+        ...cellStyle
     };
 
     return (
         <div
             id={`cell-${row}-${col}`}
-            ref={setNodeRef}
-            style={type === 0 || type === 2 ? stoneTexture : undefined}
+            style={type === 0 || type === 2 ? stoneTexture : cellStyle}
             className={clsx(
-                'w-full aspect-square border border-stone-900/30 flex items-center justify-center transition-all duration-200 relative',
+                'aspect-square border border-stone-900/30 flex items-center justify-center transition-all duration-200 relative',
                 {
                     // Wall (Intact) - Warm stone color
                     'bg-[#8B7355] shadow-[inset_0_0_10px_rgba(0,0,0,0.3)]': type === 0 && !ghostType,
@@ -59,10 +67,11 @@ export const GridCell: React.FC<GridCellProps> = React.memo(({ type, row, col, i
             )}
         </div>
     );
-}, (prevProps, nextProps) => {
-    return (
-        prevProps.type === nextProps.type &&
-        prevProps.ghostType === nextProps.ghostType &&
-        prevProps.isOverlay === nextProps.isOverlay
-    );
-});
+})
+// }, (prevProps, nextProps) => {
+//     return (
+//         prevProps.type === nextProps.type &&
+//         prevProps.ghostType === nextProps.ghostType &&
+//         prevProps.isOverlay === nextProps.isOverlay
+//     );
+// });
